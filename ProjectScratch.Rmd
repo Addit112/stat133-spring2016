@@ -1,0 +1,103 @@
+---
+title: "Untitled"
+author: "Adith Balamurugan"
+date: ""
+output: 
+  html_document:
+    fig_height: 3
+    fig_width: 5
+---
+<!-- Don't edit in between this line and the one below -->
+```{r include=FALSE}
+# Don't delete this chunk if you are using the DataComputing package
+library(DataComputing)
+```
+*Source file* 
+```{r, results='asis', echo=FALSE}
+includeSourceDocuments()
+```
+<!-- Don't edit the material above this line -->
+
+```{r}
+Master <- read.csv("Master.csv")
+Masterfilter <- Master %>%
+  select(playerID, nameFirst, nameLast, batsMaster <- read.csv("Master.csv")
+Masterfilter <- Master %>%
+  select(playerID, nameFirst, nameLast, bats, height, weight)
+Batting <- read.csv("Batting.csv")
+Fielding <- read.csv("Fielding.csv")
+Pitching <- read.csv("Pitching.csv")
+Salaries <- read.csv("Salaries.csv")
+filterSalaries <- Salaries %>% filter(salary > 1000000)
+BattingPost <- read.csv("BattingPost.csv")
+Allstar <- read.csv("AllstarFull.csv")
+FieldingOf <- read.csv("FieldingOF.csv")
+FieldingPost <- read.csv("FieldingPost.csv")
+
+filterBatting <- Batting %>%
+  filter(yearID > 1985) %>%
+  filter(G > 81) %>%
+  filter(AB > 100)
+Super<-filterBatting %>% inner_join(filterSalaries)
+Super <- Super %>% inner_join(Masterfilter)
+Super <- Super %>% mutate(battingAvg = H / AB)
+Super <- Super %>%
+  mutate(salaryGroups=ntiles(salary, n=5, format="interval"))
+Super$time = sapply(Super$yearID, det_time)
+ggplot(Super, aes(x=battingAvg, y= salary, color = salaryGroups, group=salaryGroups)) +facet_wrap(~salaryGroups, ncol =3) + geom_point()
+ggplot(Super, aes(x=AB, y= HR, group=salaryGroups)) +facet_wrap(bats~salaryGroups, ncol =3) + geom_point(aes(color = salaryGroups)) + geom_smooth(method = lm)
+ggplot(Super, aes(x=salary, y= RBI, group=salaryGroups)) + geom_point(aes(color = salaryGroups)) + geom_smooth(method = lm)
+
+old <- Super %>% filter(time == "Old") %>% mutate(salaryGroups=ntiles(salary, n=5, format="interval"))
+mid <- Super %>% filter(time == "Mid") %>% mutate(salaryGroups=ntiles(salary, n=5, format="interval"))
+new <- Super %>% filter(time == "New") %>% mutate(salaryGroups=ntiles(salary, n=5, format="interval"))
+
+ggplot(new, aes(x=salary, y= RBI, group=salaryGroups)) + geom_point(aes(color = salaryGroups)) + geom_smooth(method = lm) + facet_wrap(~bats, ncol =1)
+
+ggplot(mid, aes(x=salary, y= RBI, group=salaryGroups)) + geom_point(aes(color = salaryGroups)) + geom_smooth(method = lm) + facet_wrap(~bats, ncol=1)
+
+ggplot(old, aes(x=salary, y= RBI, group=salaryGroups)) + geom_point(aes(color = salaryGroups)) + geom_smooth(method = lm) + facet_wrap(~bats, ncol=1)
+
+ggplot(new, aes(x=salary, y= HR, group=salaryGroups)) + geom_point(aes(color = salaryGroups)) + geom_smooth(method = lm)
+
+ggplot(mid, aes(x=salary, y= HR, group=salaryGroups)) + geom_point(aes(color = salaryGroups)) + geom_smooth(method = lm)
+
+
+
+salary4 <-
+salary5 <- 
+  
+det_time = function(year) {
+  if (year < 1995) {
+    return("Old")
+  } else if (year < 2005) {
+    return("Mid")
+  } else {
+    return("New")
+  }
+}
+
+years = c(1985:2016)
+multiplier = c(0.972, 1.0698, 1.1366, 1.2042, 1.4341, 1.1976, 1.0497, 1.0863, .951, 1.0064, 1.1933, 1.0488,1.2523, 1.1513, 1.1792, 1.0180, 1.0711, .973, 1.0587, 1.0888, 1.0272, 1.0714, 1.0271, 1.01721, 1.022, 1.023, 1.026, 1.038, 1.0384, 1.03, 1, 1)
+sfunction <- function(x, y) {
+  a <- yearindex(y)
+  a = a + 1
+  for (i in a:32) {
+    x= x * multiplier[i]
+  }
+  return (x)
+}
+yearindex <- function(x) {
+  count = 1
+  for( i in years){
+    if (x == i) {
+      return (count)
+    } else {
+      count = count + 1
+    }
+  }
+} 
+Super$correctedSalary = sfunction(Super$salary, Super$year)
+
+
+```
